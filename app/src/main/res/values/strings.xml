@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Android Base</string>
+    <string name="message_loading">Loading…</string>
+</resources>

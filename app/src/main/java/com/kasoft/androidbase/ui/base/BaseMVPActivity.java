@@ -1,11 +1,22 @@
 package com.kasoft.androidbase.ui.base;
 
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.kasoft.androidbase.MyApplication;
 import com.kasoft.androidbase.R;
+import com.kasoft.androidbase.di.component.ActivityComponent;
+
+import com.kasoft.androidbase.di.component.DaggerActivityComponent;
+import com.kasoft.androidbase.di.module.ActivityModule;
 import com.kasoft.mvpbase.IPresenter;
 import com.kasoft.mvpbase.PresenterActivity;
 
@@ -15,11 +26,17 @@ import com.kasoft.mvpbase.PresenterActivity;
 
 public abstract class BaseMVPActivity<P extends IPresenter<V, S>, V extends BaseView, S extends IPresenter.State> extends PresenterActivity<P, V, S>
         implements BaseView {
+    private ActivityComponent mActivityComponent;
     private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mActivityComponent = DaggerActivityComponent.builder()
+                .activityModule(new ActivityModule(this))
+                .applicationComponent(((MyApplication) getApplication()).getComponent())
+                .build();
 
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setCancelable(false);
@@ -34,7 +51,7 @@ public abstract class BaseMVPActivity<P extends IPresenter<V, S>, V extends Base
     }
 
     @Override
-    @SuppressWarnings("")
+    @SuppressWarnings("unchecked")
     protected V getPresenterView() {
         return (V) this;
     }
@@ -45,6 +62,16 @@ public abstract class BaseMVPActivity<P extends IPresenter<V, S>, V extends Base
 
     protected void dismissProgressDialog() {
         mProgressDialog.dismiss();
+    }
+
+    @Override
+    public void hideKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     @Override
@@ -62,12 +89,29 @@ public abstract class BaseMVPActivity<P extends IPresenter<V, S>, V extends Base
     }
 
     @Override
-    public void showNoConnectionDialog() {
+    public void showNoConnectionError() {
 
     }
 
     @Override
-    public void showConnectionTimeoutDialog() {
+    public void showConnectionTimeoutError() {
 
+    }
+
+    public ActivityComponent getActivityComponent() {
+        return mActivityComponent;
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public void requestPermissionsSafely(String[] permissions, int requestCode) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(permissions, requestCode);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public boolean hasPermission(String permission) {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
     }
 }

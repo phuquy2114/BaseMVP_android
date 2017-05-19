@@ -47,13 +47,13 @@ public abstract class BasePresenter<V extends BaseView, S extends IPresenter.Sta
     @Override
     public void onConnectionTimeout() {
         if (getView() != null)
-            getView().showConnectionTimeoutDialog();
+            getView().showConnectionTimeoutError();
     }
 
     @Override
     public void onNoConnection() {
         if (getView() != null)
-            getView().showNoConnectionDialog();
+            getView().showNoConnectionError();
     }
 
     @Override

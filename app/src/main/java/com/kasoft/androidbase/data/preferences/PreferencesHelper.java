@@ -5,4 +5,10 @@ package com.kasoft.androidbase.data.preferences;
  */
 
 public interface PreferencesHelper {
+    void setAppFirstLaunch();
+
+    boolean isAppFirstLaunch();
+
+    void setAccessToken(String accessToken);
+    String getAccessToken();
 }

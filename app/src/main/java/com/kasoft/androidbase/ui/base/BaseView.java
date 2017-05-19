@@ -7,11 +7,14 @@ import com.kasoft.mvpbase.IPresenter;
  */
 
 public interface BaseView extends IPresenter.View {
+
+    void hideKeyboard();
+
     void setLoadingIndicator(boolean visible);
 
-    void showNoConnectionDialog();
+    void showNoConnectionError();
 
-    void showConnectionTimeoutDialog();
+    void showConnectionTimeoutError();
 
     void showMessage(String message);
 }
